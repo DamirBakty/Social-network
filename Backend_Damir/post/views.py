@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from rest_framework.renderers import JSONRenderer
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
+from django.contrib.auth.mixins import PermissionRequiredMixin, UserPassesTestMixin
 from .permissions import *
 
 
@@ -33,21 +34,21 @@ def register(request):
 @permission_classes((permissions.IsAuthenticated,))
 def author_posts(request, pk):
     posts = Post.objects.filter(author_id=pk)
-    data = PostSerializer(posts, many=True).data
+    data = PostSerializer(posts, many=True, context={'request': request}).data
     return Response(data)
 
 @api_view(['GET'])
 @permission_classes((permissions.IsAuthenticated,))
 def own_posts(request):
     posts = Post.objects.filter(author=request.user)
-    data = PostSerializer(posts, many=True).data
+    data = PostSerializer(posts, many=True, context={'request': request}).data
     return Response(data)
 
 @api_view(['GET'])
 @permission_classes((permissions.IsAuthenticated,))
 def post_comments(request, pk):
     comments = Comment.objects.filter(post_id=pk)
-    data = CommentSerializer(comments, many=True).data
+    data = CommentSerializer(comments, many=True, context={'request': request}).data
     return Response(data)
 
 @api_view(['GET'])
@@ -62,7 +63,7 @@ def all_posts(request):
 @permission_classes((permissions.IsAuthenticated,))
 def bookmarked_posts(request):
     posts = request.user.bookmark_set.all()
-    data = BookmarkSerializer(posts, many=True).data
+    data = BookmarkSerializer(posts, many=True, context={'request': request}).data
     return Response(data)
 
 
@@ -132,7 +133,10 @@ def make_post(request):
     else:
         return Response(post_check.errors)
 
-    return Response({'post': post_check.data,'images': image_create_serializer.data if has_image else None,'videos':video_create_serializer.data if has_video else None,'audios':audio_create_serializer.data if has_audio else None,})
+    return Response({'post': post_check.data,
+                     'images': image_create_serializer.data if has_image else None,
+                     'videos': video_create_serializer.data if has_video else None,
+                     'audios': audio_create_serializer.data if has_audio else None,})
 
 
 
@@ -197,8 +201,8 @@ class PostUpdate(generics.UpdateAPIView):
         return Response(serializer.data)
 
 
-class CommentUpdate(generics.UpdateAPIView):
-    permission_classes = (permissions.IsAuthenticated,CommentPermission)
+class CommentUpdate(PermissionRequiredMixin,UserPassesTestMixin, generics.UpdateAPIView):
+    permission_classes = (permissions.IsAuthenticated, CommentPermission)
     queryset = Comment.objects.all()
     serializer_class = CommentEditSerializer
     def update(self, request, *args, **kwargs):
@@ -211,12 +215,26 @@ class CommentUpdate(generics.UpdateAPIView):
         return Response(serializer.data)
 
 
+
 @api_view(['DELETE'])
 @permission_classes((permissions.IsAuthenticated, CommentPermission))
 def delete_comment(request,pk):
     comment = Comment.objects.get(id=pk)
     comment.delete()
     return Response('Deleted')
+
+
+
+class CommentsViewSet(viewsets.ModelViewSet):
+
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_serializer(self, *args, **kwargs):
+        if isinstance(kwargs.get('data', {}), list):
+            kwargs['many'] = True
+        return super(viewsets.ModelViewSet, self).get_serializer(*args, **kwargs)
 
 
 @api_view(['DELETE'])

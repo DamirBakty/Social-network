@@ -7,22 +7,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
-class UsernameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['username']
-
-
-class UserPasswordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['password']
-
 
 class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username','password']
+        yours = serializers.SerializerMethodField()
 
 
 class PostImageSerializer(serializers.ModelSerializer):
@@ -95,21 +85,35 @@ class PostSerializer(serializers.ModelSerializer):
     def get_author_name(self,obj):
         return str(obj.author)
 
+    def get_yours(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        return True if user == obj.owner else False
+
 class CommentSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     liked = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    yours = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
         fields = '__all__'
 
     def get_author_name(self, obj):
-        print(str(obj.owner))
         return str(obj.owner)
 
     def get_likes_count(self, obj):
         return obj.likes_count
+
+    def get_yours(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        return True if user == obj.owner else False
 
     def get_liked(self, obj):
         user = None
