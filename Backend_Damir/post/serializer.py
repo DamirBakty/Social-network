@@ -12,6 +12,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username','password']
+        yours = serializers.SerializerMethodField()
 
 
 class PostImageSerializer(serializers.ModelSerializer):
@@ -110,6 +111,13 @@ class CommentSerializer(serializers.ModelSerializer):
 
     def get_likes_count(self, obj):
         return obj.likes_count
+
+    def get_yours(self, obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        return True if user == obj.owner else False
 
     def get_liked(self, obj):
         user = None

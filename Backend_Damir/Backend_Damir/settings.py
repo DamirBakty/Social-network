@@ -57,6 +57,8 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'http://127.0.0.1:3000',
+
 ]
 
 CORS_ALLOW_ALL_ORIGINS: True
@@ -144,7 +146,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-MEDIA_ROOT = '/home/damir/PycharmProjects/Social-network/Backend_Damir/'
+MEDIA_ROOT = 'C:/Users/mahmu/OneDrive/Documents/GitTrash/Social-network/Backend_Damir/'
 
 MEDIA_URL = '/media/'
 

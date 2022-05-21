@@ -1,44 +1,33 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import *
-
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username','id']
-
 class MessageSerializer(serializers.ModelSerializer):
     yours = serializers.SerializerMethodField()
     owner = serializers.SerializerMethodField()
-
     class Meta:
         model = Message
         fields = '__all__'
-
     def get_yours(self, obj):
         user = None
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             user = request.user
         return True if user == obj.owner else False
-
     def get_owner(self,obj):
         return obj.owner.username
-
 class MessageSendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['text','owner','chat']
-
-
 class MessageLoadSerializer(serializers.ModelSerializer):
     messages = serializers.SerializerMethodField()
-
     class Meta:
         model = Chat
         fields = '__all__'
-
     def get_messages(self, obj):
         messages = Message.objects.filter(chat=obj)
         return MessageSerializer(messages,many = True).data
@@ -52,7 +41,6 @@ class ChatSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
     )
-
     class Meta:
         model = Chat
         fields = '__all__'
