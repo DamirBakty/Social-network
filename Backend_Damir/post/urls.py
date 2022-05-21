@@ -10,6 +10,7 @@ urlpatterns = (
     path('all_posts/', views.all_posts), # get all posts
     path('user_stories/<int:pk>', views.user_stories), # get user stories
     path('users_stories/', views.users_stories), # get all users stories
+    path('story_readers/<int:pk>', views.story_readers), # get readers list of story
     path('own_posts/', views.own_posts), # get own posts
     path('bookmarked_posts/', views.bookmarked_posts), # get bookmarked posts
 

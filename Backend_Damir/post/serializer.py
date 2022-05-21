@@ -223,3 +223,13 @@ class StoryMakeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stories
         fields = ['image']
+
+class StoryReadersSerializer(serializers.ModelSerializer):
+    readers = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='username'
+    )
+    class Meta:
+        model = Stories
+        fields = ['readers']

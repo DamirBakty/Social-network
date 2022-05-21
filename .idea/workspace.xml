@@ -24,7 +24,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Backend_Damir" />
   </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
@@ -60,6 +60,7 @@
       <updated>1648487039029</updated>
       <workItem from="1648487041595" duration="1486000" />
       <workItem from="1648488615900" duration="1697000" />
+      <workItem from="1648490322698" duration="131000" />
     </task>
     <servers />
   </component>

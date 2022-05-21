@@ -84,8 +84,15 @@ def user_stories(request,pk):
 @permission_classes((permissions.IsAuthenticated,))
 def users_stories(request):
     yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-    users = User.objects.filter(user_story__posted__gte=yesterday)
+    users = list(dict.fromkeys(User.objects.filter(user_story__posted__gte=yesterday)))
     data = UserStoriesSerializer(users, many=True, context={'request': request}).data
+    return Response(data)
+
+@api_view(['GET'])
+@permission_classes((permissions.IsAuthenticated,))
+def story_readers(request,pk):
+    story = Stories.objects.get(id=pk)
+    data = StoryReadersSerializer(story, context={'request': request}).data
     return Response(data)
 
 @api_view(['POST'])
