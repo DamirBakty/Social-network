@@ -1,5 +1,5 @@
 from django.db import models
-
+import datetime
 class Chat(models.Model):
     user = models.ManyToManyField('auth.User',related_name='user_chats')
     created_date = models.DateTimeField(auto_now_add=True)
@@ -12,7 +12,7 @@ class Message(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            self.chat.created_date = self.send_date
+            self.chat.created_date = datetime.datetime.now()
             self.chat.save()
         super().save(*args, **kwargs)
 
