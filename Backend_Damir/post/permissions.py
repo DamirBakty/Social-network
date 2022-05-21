@@ -39,3 +39,13 @@ class PostPermission(permissions.BasePermission):
         if Post.objects.get(id=view.kwargs.get('pk')).author == request.user:
             return True
         return False
+
+class StoryPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in ['GET', 'PUT'] and obj.author == request.user:
+            return True
+        return False
+    def has_permission(self, request, view):
+        if Post.objects.get(id=view.kwargs.get('pk')).author == request.user:
+            return True
+        return False

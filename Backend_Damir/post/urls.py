@@ -8,14 +8,18 @@ urlpatterns = (
     path('author_posts/<int:pk>', views.author_posts), # get author posts
     path('post_comments/<int:pk>', views.post_comments), # get post comments
     path('all_posts/', views.all_posts), # get all posts
+    path('user_stories/<int:pk>', views.user_stories), # get user stories
+    path('users_stories/', views.users_stories), # get all users stories
     path('own_posts/', views.own_posts), # get own posts
     path('bookmarked_posts/', views.bookmarked_posts), # get bookmarked posts
 
     path('make_post/', views.make_post), # make post
     path('create_comment/', views.create_comment), # create comment
+    path('create_story/', views.make_story), # make a story
 
     path('delete_post/<int:pk>', views.delete_post),
     path('delete_comment/<int:pk>', views.delete_comment),
+    path('delete_story/<int:pk>', views.delete_story),
 
     path('like_post/<int:pk>/', views.PostLikeView.as_view()), # like post
     path('like_comment/<int:pk>/', views.CommentLikeView.as_view()), # like comment

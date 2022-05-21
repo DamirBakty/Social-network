@@ -9,7 +9,8 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 from .permissions import *
-
+from .paginations import *
+import datetime
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all().order_by('-date_joined')
@@ -36,6 +37,13 @@ def author_posts(request, pk):
     data = PostSerializer(posts, many=True, context={'request': request}).data
     return Response(data)
 
+# @api_view(['GET'])
+# @permission_classes((permissions.IsAuthenticated,))
+# def user_stories(request, pk):
+#     posts = Post.objects.filter(author_id=pk)
+#     data = PostSerializer(posts, many=True, context={'request': request}).data
+#     return Response(data)
+
 @api_view(['GET'])
 @permission_classes((permissions.IsAuthenticated,))
 def own_posts(request):
@@ -56,6 +64,39 @@ def all_posts(request):
     posts = Post.objects.all().order_by('-pub_date')
     data = PostSerializer(posts, many=True, context={'request': request}).data
     return Response(data)
+
+@api_view(['GET'])
+@permission_classes((permissions.IsAuthenticated,))
+def user_stories(request,pk):
+    yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
+    stories = Stories.objects.filter(posted__gte=yesterday,user_id=pk)
+    paginator = StoryResultsSetPagination()
+    result_page = paginator.paginate_queryset(stories, request)
+    try:
+        story_id = result_page[0].id
+    except:
+        story_id = None
+    Stories.objects.get(id=story_id).readers.add(request.user)
+    data = StoriesSerializer(result_page, many=True, context={'request': request}).data
+    return paginator.get_paginated_response(data)
+
+@api_view(['GET'])
+@permission_classes((permissions.IsAuthenticated,))
+def users_stories(request):
+    yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
+    users = User.objects.filter(user_story__posted__gte=yesterday)
+    data = UserStoriesSerializer(users, many=True, context={'request': request}).data
+    return Response(data)
+
+@api_view(['POST'])
+@permission_classes((permissions.IsAuthenticated,))
+def make_story(request):
+    serializer = StoryMakeSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save(user=request.user)
+        return Response(status=201)
+    else:
+        return Response(serializer.errors)
 
 
 @api_view(['GET'])
@@ -132,8 +173,7 @@ def make_post(request):
     else:
         return Response(post_check.errors)
 
-    return Response({'post': post_check.data,'images': image_create_serializer.data if has_image else None,'videos':video_create_serializer.data if has_video else None,'audios':audio_create_serializer.data if has_audio else None,})
-
+    return Response(status=201)
 
 
 @api_view(['POST'])
@@ -142,7 +182,7 @@ def create_comment(request):
     serializer = CreateCommentSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save(owner=request.user)
-        return Response(serializer.data)
+        return Response(status=201)
     else:
         return Response(serializer.errors)
 
@@ -216,6 +256,13 @@ class CommentUpdate(generics.UpdateAPIView):
 def delete_comment(request,pk):
     comment = Comment.objects.get(id=pk)
     comment.delete()
+    return Response('Deleted')
+
+@api_view(['DELETE'])
+@permission_classes((permissions.IsAuthenticated, StoryPermission))
+def delete_story(request,pk):
+    story = Stories.objects.get(id=pk)
+    story.delete()
     return Response('Deleted')
 
 

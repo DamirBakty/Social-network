@@ -187,3 +187,31 @@ class AudioCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostAudio
         fields = ['owner','audio','post']
+
+class StoriesSerializer(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+    yours = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Stories
+        fields = ('id','username','image','user','yours')
+
+    def get_username(self, obj):
+        return str(obj.user)
+
+    def get_yours(self,obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        return True if user == obj.user else False
+
+class UserStoriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username','id']
+
+class StoryMakeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stories
+        fields = ['image']
