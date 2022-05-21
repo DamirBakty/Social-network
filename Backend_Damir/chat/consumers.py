@@ -14,7 +14,7 @@ class ChatConsumer(WebsocketConsumer):
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
 
         self.room_group_name = 'chat_%s' % self.chat_id
-
+        print(self.chat_id)
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
@@ -34,6 +34,7 @@ class ChatConsumer(WebsocketConsumer):
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
+        print(text_data_json)
         message = text_data_json['message']
         data = {'text': message, 'chat': self.chat_id, 'owner': self.client.id}
 
@@ -43,7 +44,7 @@ class ChatConsumer(WebsocketConsumer):
             data = MessageSerializer(self.messager).data
         else:
             print(serializer.errors)
-        user_id = data['owner']
+        user = data['owner']
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
@@ -51,7 +52,7 @@ class ChatConsumer(WebsocketConsumer):
                 'message': data['text'],
                 'send_date': data['send_date'],
                 'message_id': data['id'],
-                'message_owner': user_id
+                'message_owner': user
             }
         )
     def chat_message(self, event):
@@ -67,7 +68,7 @@ class ChatConsumer(WebsocketConsumer):
             'event': "Send",
             'message': message,
             'chat_id': self.chat_id,
-            'username': self.client.username,
+            'username': mes_owner,
             'send_date': send_date,
             'message_id': message_id,
             'yours': yours
