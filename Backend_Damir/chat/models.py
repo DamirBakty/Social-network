@@ -1,5 +1,4 @@
 from django.db import models
-from datetime import datetime
 
 class Chat(models.Model):
     user = models.ManyToManyField('auth.User',related_name='user_chats')
@@ -13,9 +12,9 @@ class Message(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.id:
-            self.chat.created_date = datetime.now()
+            self.chat.created_date = self.send_date
+            self.chat.save()
         super().save(*args, **kwargs)
-
 
 class MessageImage(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE)

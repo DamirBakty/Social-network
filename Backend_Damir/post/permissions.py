@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from .models import Comment,Post,PostImage
+from .models import Comment, Post, PostImage
 
 
 class CommentPermission(permissions.BasePermission):

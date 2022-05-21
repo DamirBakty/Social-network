@@ -63,3 +63,4 @@ class CreateChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = ['user']
+

@@ -9,8 +9,10 @@ from rest_framework.authtoken.models import Token
 
 class ChatConsumer(WebsocketConsumer):
 
+
     def connect(self):
         self.chat_id = self.scope['url_route']['kwargs']['chat_id']
+
         self.room_group_name = 'chat_%s' % self.chat_id
 
         async_to_sync(self.channel_layer.group_add)(
@@ -22,11 +24,13 @@ class ChatConsumer(WebsocketConsumer):
         token = self.scope['subprotocols'][1]
         self.client = Token.objects.get(key=token).user
 
+
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name,
             self.channel_name
         )
+
 
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -50,8 +54,10 @@ class ChatConsumer(WebsocketConsumer):
                 'message_owner': user_id
             }
         )
-
     def chat_message(self, event):
+
+
+
         message = event['message']
         send_date = event['send_date']
         message_id = event['message_id']
