@@ -45,7 +45,7 @@ class PostSerializer(serializers.ModelSerializer):
     liked = serializers.SerializerMethodField()
     bookmarked = serializers.SerializerMethodField()
     author_name = serializers.SerializerMethodField()
-
+    yours = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -122,6 +122,13 @@ class CommentSerializer(serializers.ModelSerializer):
             user = request.user
         like = CommentLike.objects.filter(comment=obj, user=user)
         return True if like else False
+
+    def get_yours(self,obj):
+        user = None
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            user = request.user
+        return True if user == obj.owner else False
 
 class BookmarkSerializer(serializers.ModelSerializer):
     post = PostSerializer()

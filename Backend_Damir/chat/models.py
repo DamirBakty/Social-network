@@ -16,6 +16,7 @@ class Message(models.Model):
             self.chat.created_date = datetime.now()
         super().save(*args, **kwargs)
 
+
 class MessageImage(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     owner = models.ForeignKey('auth.User', on_delete=models.DO_NOTHING)

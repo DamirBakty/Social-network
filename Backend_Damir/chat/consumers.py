@@ -7,7 +7,6 @@ from .serializer import MessageSendSerializer, MessageSerializer
 from rest_framework.authtoken.models import Token
 
 
-
 class ChatConsumer(WebsocketConsumer):
 
     def connect(self):
@@ -33,7 +32,6 @@ class ChatConsumer(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         data = {'text': message, 'chat': self.chat_id, 'owner': self.client.id}
-
 
         serializer = MessageSendSerializer(data=data)
         if serializer.is_valid():
