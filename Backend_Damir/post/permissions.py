@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from .models import Comment, Post, PostImage
+from .models import Comment, Post, PostImage, Stories
 
 
 class CommentPermission(permissions.BasePermission):
@@ -42,10 +42,10 @@ class PostPermission(permissions.BasePermission):
 
 class StoryPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        if request.method in ['GET', 'PUT'] and obj.author == request.user:
+        if request.method in ['GET', 'PUT','DELETE'] and obj.user == request.user:
             return True
         return False
     def has_permission(self, request, view):
-        if Post.objects.get(id=view.kwargs.get('pk')).author == request.user:
+        if Stories.objects.get(id=view.kwargs.get('pk')).user == request.user:
             return True
         return False
