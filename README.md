@@ -2,7 +2,7 @@
 Backend of Social-network,Analogue of VK.
 
 # Main tools
-DRF, Sqlite, Redis, React for front
+DRF, Sqlite, Redis, React for frontend
 
 # Installation of libraries
 pip install -r requirements.txt
